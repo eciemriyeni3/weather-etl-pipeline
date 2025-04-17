@@ -23,9 +23,16 @@ jobs:
               run: |
                 pip install -r requirements.txt
             
+            - name: Decode GCP credentials
+              run: |
+                echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 --decode > gcp-key.json
+              env:
+                GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace}}/gcp-key.json
+            
             - name: Run ETL
+              run: python etl_pipeline.py
               env:
                 WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
                 BIGQUERY_TABLE: ${{ secrets.BIGQUERY_TABLE}}
-              run: |
-                python etl_pipeline.py
+                GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-key.json
+              
